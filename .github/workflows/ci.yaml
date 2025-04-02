@@ -21,19 +21,23 @@ env:
   VERSION_TAG: 19.1
 
 jobs:
-  push-docker:
+  build-push-docker:
     if: github.ref_name == 'main' || github.ref_name == 'dev'
     runs-on: ubuntu-latest
     steps:
+      # 📦 Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 🛠 Docker Setup & Build
       - name: Set Up Docker
         uses: docker/setup-buildx-action@v3
 
+      # 🔐 Login to GitHub Container Registry (Docker)
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      # 🚀 Push Docker Image
       - name: Build and Push Docker Image
         run: |
           docker build -t ${{ env.IMAGE_NAME }}:${{ env.VERSION_TAG }} .
@@ -41,14 +45,26 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.VERSION_TAG }}
           docker push ${{ env.IMAGE_NAME }}:${{ env.BRANCH_NAME}}-${{ env.LATEST_TAG }}
 
+  build-push-helm:
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
+    runs-on: ubuntu-latest
+    steps:
+      # 📦 Checkout Repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 📦 Helm Chart Packaging
       - name: Package Helm Chart
         run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm lint openolat
           helm package openolat
           mv *.tgz chart.tgz
 
+      # 🔐 Login to GitHub Container Registry (Helm)
       - name: Login to GitHub Container Registry for Helm
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${{ github.actor }}" --password-stdin
 
+      # 🚀 Push Helm Chart
       - name: Push Helm Chart to GitHub Container Registry
         run: helm push chart.tgz oci://${{ env.IMAGE_NAME }}
