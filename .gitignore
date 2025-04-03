@@ -44,3 +44,4 @@ src/test/java/org/olat/selenium/SeleniumTest.java
 
 **/node_modules/
 package-lock.json
+.vscode/
