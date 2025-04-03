@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.olat.core.gui.UserRequest;
 import org.olat.core.gui.components.Component;
@@ -330,7 +331,7 @@ public class VideoTaskRunController extends BasicController implements GenericEv
 		if(segments != null) {
 			selectedSegmentCategories = segments.getCategories().stream()
 					.filter(cat -> categories.contains(cat.getId()))
-					.toList();
+					.collect(Collectors.toList());
 			VideoTaskHelper.sortCategories(selectedSegmentCategories, courseNode, getLocale());
 		} else {
 			selectedSegmentCategories = List.of();
@@ -355,7 +356,7 @@ public class VideoTaskRunController extends BasicController implements GenericEv
 	}
 
 	private void doShowLogs(UserRequest ureq, List<LogEntry> logEntries) {
-		UserAvatarMapper userAvatarMapper = new UserAvatarMapper(false);
+		UserAvatarMapper userAvatarMapper = new UserAvatarMapper();
 		String mapperPath = registerMapper(ureq, userAvatarMapper);
 		List<TimelineModel.TimelineYear> logTimeline = TimelineBuilder.buildLogEntriesTimeline(logEntries, getLocale(), userAvatarMapper, mapperPath);
 

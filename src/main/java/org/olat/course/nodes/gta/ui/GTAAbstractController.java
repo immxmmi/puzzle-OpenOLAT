@@ -847,8 +847,8 @@ public abstract class GTAAbstractController extends BasicController implements G
 
 	protected void doShowLogs(UserRequest ureq, List<LogEntry> logEntries,
 							  String logContent, VelocityContainer contentVC) {
-		if (!logContent.isBlank() && logEntries != null && !logEntries.isEmpty()) {
-			UserAvatarMapper userAvatarMapper = new UserAvatarMapper(false);
+		if (withGrading && !logContent.isBlank() && logEntries != null && !logEntries.isEmpty()) {
+			UserAvatarMapper userAvatarMapper = new UserAvatarMapper();
 			String mapperPath = registerMapper(ureq, userAvatarMapper);
 			List<TimelineModel.TimelineYear> logTimeline = TimelineBuilder.buildLogEntriesTimeline(logEntries, getLocale(), userAvatarMapper, mapperPath);
 
