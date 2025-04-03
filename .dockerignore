@@ -1,0 +1,24 @@
+# Maven build output
+target/
+
+# Git and IDE
+#.git/
+.vscode/
+*.iml
+
+# OS / Editor junk
+.DS_Store
+*.log
+
+# Others
+*.swp
+*.iml
+*.tmp
+*.bak
+dependency-reduced-pom.xml
+hs_err_pid*.log
+
+openolat/
+docker-compose.yml
+
+
