@@ -1,36 +1,34 @@
 services:
-  #openolat:
-  #  build: .
- #   ports:
- #     - "8082:8080"
- #   environment:
- #     - DB_HOST=postgres-db
- #     - DB_PORT=5432
- #     - DB_USERNAME=openolat
- #     - DB_PASSWORD=openolat
- #     - DB_NAME=openolat
- #   depends_on:
- #     - postgres-db
-  #  command: sh -c "until nc -z -v -w30 postgres-db 5432; do echo 'Waiting for database connection...'; sleep 5; done;r"
-
-  openolat-manuell:
-    build:
-      context: .
-      dockerfile: Dockerfile.release-based
-      args:
-        OPENOLAT_VERSION: 2001
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_USERNAME=openolat
-      - DB_PASSWORD=openolat
-      - DB_NAME=openolat
-    depends_on:
-      - postgres-db
- #   command: sh -c "until nc -z -v -w30 postgres-db 5432; do echo 'Waiting for database connection...'; sleep 5; done; ./start.sh"
-
+  openolat:
+   build: .
+   ports:
+     - "8080:8080"
+   environment:
+     - DB_HOST=postgres-db
+     - DB_PORT=5432
+     - DB_USERNAME=openolat
+     - DB_PASSWORD=openolat
+     - DB_NAME=openolat
+   depends_on:
+     - postgres-db
+  
+  # openolat-manuell:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.release-based
+  #     args:
+  #       OPENOLAT_VERSION: 2001
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - DB_HOST=postgres-db
+  #     - DB_PORT=5432
+  #     - DB_USERNAME=openolat
+  #     - DB_PASSWORD=openolat
+  #     - DB_NAME=openolat
+  #   depends_on:
+  #     - postgres-db
+  
   postgres-db:
     image: postgres:17
     environment:

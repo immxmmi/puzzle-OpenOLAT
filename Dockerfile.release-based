@@ -1,6 +1,6 @@
 FROM tomcat:10.1.35-jdk17
 
-# System vorbereiten
+# Prepare system and install envsubst
 RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
 
 ENV LC_ALL=en_US.UTF-8
@@ -9,7 +9,7 @@ ENV LANGUAGE=en_US.UTF-8
 
 WORKDIR /usr/local/tomcat
 
-# OpenOlat WAR
+# Download and extract OpenOlat WAR file
 ARG OPENOLAT_VERSION
 RUN curl -L -o openolat.war https://www.openolat.com/releases/openolat_${OPENOLAT_VERSION}.war \
     && mkdir openolat-${OPENOLAT_VERSION} \
@@ -28,7 +28,7 @@ COPY ./config/conf/server.xml conf/server.xml
 COPY ./config/bin/start.sh bin/start.sh
 RUN chmod +x bin/start.sh
 
-# OpenOlat
+# Create necessary directories for OpenOlat runtime
 RUN mkdir -p lib conf/Catalina/localhost logs olatdata webapp
 
 # olat.local.properties
@@ -43,10 +43,12 @@ RUN envsubst < conf/Catalina/localhost/ROOT.template.xml > conf/Catalina/localho
 # log4j2.xml
 COPY ./config/lib/log4j2.xml lib/log4j2.xml
 
+# Create non-root user and set proper permissions
 RUN useradd -m -U -d /home/openolat -s /bin/bash openolat \
     && chgrp -R 0 /usr/local/tomcat \
     && chmod -R g+rwX /usr/local/tomcat
 
+# Switch to non-root user for security
 USER openolat
 
 EXPOSE 8080
