@@ -1,8 +1,8 @@
 #!/bin/bash
 
-export CATALINA_BASE=/home/openolat
-export CATALINA_HOME=/home/openolat/tomcat
-export JRE_HOME=/home/openolat/jre
+export CATALINA_BASE=/usr/local
+export CATALINA_HOME=$CATALINA_BASE/tomcat
+export JRE_HOME=/opt/java/openjdk
 
 export JAVA_XMS="-Xms1024m"
 export JAVA_XMX="-Xmx1024m"
@@ -17,5 +17,5 @@ export JAVA_DUMP="-XX:HeapDumpPath=."
 
 export CATALINA_OPTS=" \
 $JAVA_XMS $JAVA_XMX $JAVA_META $JAVA_USER $JAVA_TIMEZONE \
-$JAVA_PROFILE $JAVA_HEADLESS $JAVA_IPV4 $JAVA_OOM $JAVA_DUMP \
+$JAVA_PROFILE $JAVA_HEADLESS $JAVA_IPV4 $JAVA_OOM $JAVA_DUMP
 "
