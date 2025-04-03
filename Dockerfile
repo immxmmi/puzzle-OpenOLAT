@@ -2,22 +2,31 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /build
 COPY . .
-COPY olat.local.properties /usr/local/tomcat/lib/
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM tomcat:10.1-jdk17
+FROM tomcat:10.1.35-jre17
+RUN apt-get update && apt-get install -y gettext && rm -rf /var/lib/apt/lists/*
+
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+
 WORKDIR /usr/local/tomcat
 
-# Copy the OLAT configuration files
-COPY config/tomcat/log4j2.xml /usr/local/tomcat/lib/
-COPY config/tomcat/setenv.sh /usr/local/tomcat/bin/
-COPY config/tomcat/server.xml /usr/local/tomcat/conf/
-COPY config/tomcat/ROOT.xml /usr/local/tomcat/conf/Catalina/localhost/
-COPY config/tomcat/start.sh /usr/local/tomcat/
+
+COPY  config/tomcat/setenv.sh bin/
+COPY  config/tomcat/server.xml conf/
+COPY  olat.local.properties lib/
+COPY  config/tomcat/ROOT.template.xml conf/Catalina/localhost/
+COPY  config/tomcat/log4j2.xml lib/
+
+
+COPY config/tomcat/start.sh /bin/
+RUN chmod +x /bin/start.sh
 
 RUN rm -rf webapps/*
 COPY --from=builder /build/target/*.war webapps/ROOT.war
 
 EXPOSE 8080
-CMD ["catalina.sh", "run"]
+CMD ["start.sh"]
