@@ -1,0 +1,129 @@
+FROM tomcat:10.1.35-jdk17
+
+# System vorbereiten
+RUN apt-get update && apt-get install -y curl unzip gettext && rm -rf /var/lib/apt/lists/*
+
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+
+WORKDIR /usr/local/tomcat
+
+# OpenOlat WAR
+ARG OPENOLAT_VERSION
+RUN curl -L -o openolat.war https://www.openolat.com/releases/openolat_${OPENOLAT_VERSION}.war \
+    && mkdir openolat-${OPENOLAT_VERSION} \
+    && cd openolat-${OPENOLAT_VERSION} && jar xf ../openolat.war \
+    && ln -s openolat-${OPENOLAT_VERSION} /usr/local/tomcat/webapp \
+    && rm /usr/local/tomcat/openolat.war
+
+# setenv.sh
+RUN echo '#!/bin/bash\n\
+  CATALINA_HOME=/usr/local/tomcat\n\
+  CATALINA_BASE=/usr/local/tomcat\n\
+  JRE_HOME=/opt/java/openjdk\n\
+  CATALINA_PID=/usr/local/tomcat/run/openolat.pid\n\
+  CATALINA_TMPDIR=/tmp/openolat\n\
+  mkdir -p $CATALINA_TMPDIR\n\
+  CATALINA_OPTS=" \\\n\
+  -Xmx1024m -Xms512m -XX:MaxMetaspaceSize=512m \\\n\
+  -Duser.name=openolat \\\n\
+  -Duser.timezone=Europe/Zurich \\\n\
+  -Dspring.profiles.active=myprofile \\\n\
+  -Djava.awt.headless=true \\\n\
+  -Djava.net.preferIPv4Stack=true \\\n\
+  -Djava.security.egd=file:/dev/urandom \\\n\
+  -XX:+HeapDumpOnOutOfMemoryError \\\n\
+  -XX:HeapDumpPath=. \\\n\
+  "' > bin/setenv.sh && chmod +x bin/setenv.sh
+
+# server.xml
+RUN echo '<?xml version="1.0" encoding="utf-8"?>\n\
+<Server port="8085" shutdown="SHUTDOWN">\n\
+  <Service name="Catalina">\n\
+    <Connector port="8088" protocol="HTTP/1.1" />\n\
+    <Engine name="Catalina" defaultHost="localhost">\n\
+      <Host name="localhost" appBase="webapps" />\n\
+    </Engine>\n\
+  </Service>\n\
+</Server>' > conf/server.xml
+
+# Start-Skript
+RUN echo '#!/bin/bash\n\
+echo "Tomcat started."\n\
+exec catalina.sh run' > /bin/start.sh && chmod +x /bin/start.sh
+
+# OpenOlat
+RUN mkdir -p lib conf/Catalina/localhost logs olatdata webapp
+
+# olat.local.properties
+RUN echo 'db.source=jndi\n\
+  db.jndi=java:comp/env/jdbc/openolatDS\n\
+  db.vendor=postgresql\n\
+  installation.dir=/home/openolat\n\
+  log.dir=/home/openolat/logs\n\
+  server.contextpath=/openolat\n\
+  server.domainname=localhost\n\
+  server.port=8088\n\
+  server.port.ssl=0\n\
+  smtp.host=disabled\n\
+  tomcat.id=1\n\
+  userdata.dir=/home/openolat/olatdata' > lib/olat.local.properties
+
+# ROOT.xml
+RUN echo '<?xml version="1.0" encoding="UTF-8" ?>\n\
+  <Context path="" docBase="/usr/local/tomcat/webapp" debug="0" reloadable="false" allowLinking="true">\n\
+       <Resource name="jdbc/openolatDS" auth="Container" type="javax.sql.DataSource"\n\
+           maxTotal="16" maxIdle="4" maxWaitMillis="60000"\n\
+           username="${DB_USERNAME}" password="${DB_PASSWORD}"\n\
+           driverClassName="org.postgresql.Driver"\n\
+           validationQuery="SELECT 1"\n\
+           validationQueryTimeout="-1"\n\
+           testOnBorrow="true"\n\
+           testOnReturn="false"\n\
+           url="jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}"/>\n\
+  </Context>' > conf/Catalina/localhost/ROOT.xml
+
+# log4j2.xml
+RUN echo '<?xml version="1.0" encoding="UTF-8"?>\n\
+  <Configuration status="WARN">\n\
+     <Appenders>\n\
+         <RollingFile name="RollingFile" fileName="/home/openolat/logs/olat.log"\n\
+             filePattern="/home/openolat/logs/olat.log.%d{yyyy-MM-dd}">\n\
+             <PatternLayout\n\
+                     pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %marker %c{1} ^%%^ I%X{ref}-J%sn ^%%^ %logger{36} ^%%^ %X{identityKey} ^%%^ %X{ip} ^%%^ %X{referer} ^%%^ %X{userAgent} ^%%^ %msg%ex{full,separator( )}%n" />\n\
+             <Policies>\n\
+                 <TimeBasedTriggeringPolicy interval="1" />\n\
+             </Policies>\n\
+         </RollingFile>\n\
+     </Appenders>\n\
+     <Loggers>\n\
+         <Logger name="org.apache.commons.httpclient" additivity="false" level="warn">\n\
+             <AppenderRef ref="RollingFile" />\n\
+         </Logger>\n\
+         <Logger name="org.apache.pdfbox" additivity="false" level="fatal">\n\
+             <AppenderRef ref="RollingFile" />\n\
+         </Logger>\n\
+         <Logger name="org.apache.fontbox" additivity="false" level="fatal">\n\
+             <AppenderRef ref="RollingFile" />\n\
+         </Logger>\n\
+         <Logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" additivity="false" level="fatal">\n\
+             <AppenderRef ref="RollingFile" />\n\
+         </Logger>\n\
+         <Logger name="org.hibernate.SQL" additivity="false" level="fatal">\n\
+             <AppenderRef ref="RollingFile" />\n\
+         </Logger>\n\
+          <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" additivity="false" level="fatal">\n\
+              <AppenderRef ref="RollingFile" />\n\
+          </Logger>\n\
+          <Logger name="org.apache.activemq.audit" additivity="false" level="warn">\n\
+             <AppenderRef ref="RollingFile" />\n\
+          </Logger>\n\
+          <Root level="info">\n\
+              <AppenderRef ref="RollingFile" />\n\
+          </Root>\n\
+     </Loggers>\n\
+  </Configuration>' > lib/log4j2.xml
+
+EXPOSE 8080
+CMD ["start.sh"]
