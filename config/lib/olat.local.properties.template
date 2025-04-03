@@ -11,7 +11,7 @@
 ########################################################################
 
 # runtime application data directory. Tomcat user needs R/W permissions here
-userdata.dir=/opt/openolat/olatdata
+userdata.dir=${CATALINA_BASE}/olatdata
 
 ########################################################################
 # Database settings

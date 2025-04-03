@@ -43,5 +43,11 @@ RUN envsubst < conf/Catalina/localhost/ROOT.template.xml > conf/Catalina/localho
 # log4j2.xml
 COPY ./config/lib/log4j2.xml lib/log4j2.xml
 
+RUN useradd -m -U -d /home/openolat -s /bin/bash openolat \
+    && chgrp -R 0 /usr/local/tomcat \
+    && chmod -R g+rwX /usr/local/tomcat
+
+USER openolat
+
 EXPOSE 8080
 CMD ["./bin/start.sh"]
