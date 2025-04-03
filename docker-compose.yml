@@ -20,7 +20,7 @@ services:
       args:
         OPENOLAT_VERSION: 2001
     ports:
-      - "8083:8080"
+      - "8080:8080"
     environment:
       - DB_HOST=postgres-db
       - DB_PORT=5432
@@ -32,7 +32,7 @@ services:
  #   command: sh -c "until nc -z -v -w30 postgres-db 5432; do echo 'Waiting for database connection...'; sleep 5; done; ./start.sh"
 
   postgres-db:
-    image: postgres:12
+    image: postgres:17
     environment:
       POSTGRES_USER: openolat
       POSTGRES_PASSWORD: openolat

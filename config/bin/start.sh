@@ -12,17 +12,6 @@ export DB_NAME=${DB_NAME:-openolat}
 : "${DB_PASSWORD:?Missing DB_PASSWORD}"
 : "${DB_NAME:?Missing DB_NAME}"
 
-if [ ! -f $CATALINA_HOME/conf/Catalina/localhost/ROOT.template.xml ]; then
-  echo "ROOT.template.xml not found!"
-  exit 1
-fi
-
-echo "Generating ROOT.xml from template..."
-envsubst < $CATALINA_HOME/conf/Catalina/localhost/ROOT.template.xml > $CATALINA_HOME/conf/Catalina/localhost/ROOT.xml
-echo "Generated ROOT.xml:"
-cat $CATALINA_HOME/conf/Catalina/localhost/ROOT.xml
-
 echo "Starting Tomcat..."
 echo "Calling catalina.sh directly..."
-$CATALINA_HOME/bin/catalina.sh run
-exit $?
+exec $CATALINA_HOME/bin/catalina.sh run
