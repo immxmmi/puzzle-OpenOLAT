@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-deployment
   labels:
-    {{- include "{{ .Release.Name }}.labels" . | nindent 4 }}
+    {{- include "openolat.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include (print .Release.Name ".selectorLabels") . | nindent 6 }}
+      {{- include "openolat.selectorLabels" . | nindent 6 }}
   replicas: {{ .Values.deployment.replicas }}
   template:
     metadata:
       labels:
-        {{- include (print .Release.Name ".selectorLabels") . | nindent 8 }}
+        {{- include "openolat.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - name: {{ .Release.Name }}

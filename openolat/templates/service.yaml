@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-svc
   labels:
-    {{- include (print .Release.Name ".labels") . | nindent 4 }}
+    {{- include "openolat.labels" . | nindent 4 }}
 spec:
   selector:
-    {{- include (print .Release.Name ".selectorLabels") . | nindent 4 }}
+    {{- include "openolat.selectorLabels" . | nindent 4 }}
   ports:
     - protocol: TCP
       port: 8080

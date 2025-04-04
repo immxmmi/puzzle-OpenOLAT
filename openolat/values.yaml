@@ -3,5 +3,8 @@ deployment:
   tag: dev-latest
   replicas: 1
 
+service:
+  port: 8080
+
 ingress:
   hostname: "openolat.frentix.com"
