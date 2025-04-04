@@ -1,13 +1,18 @@
-FROM tomcat:10.1.35-jdk17
+FROM tomcat:10.1-jre17
 
-# Prepare system and install envsubst
-RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
+# Prepare system packages
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext-base unzip \
+    && apt-get purge -y && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 
 WORKDIR /usr/local/tomcat
+RUN chmod -R 777 /usr/local/tomcat
 
 # Download and extract OpenOlat WAR file
 ARG OPENOLAT_VERSION
@@ -28,26 +33,23 @@ COPY ./config/conf/server.xml conf/server.xml
 COPY ./config/bin/start.sh bin/start.sh
 RUN chmod +x bin/start.sh
 
-# Create necessary directories for OpenOlat runtime
-RUN mkdir -p lib conf/Catalina/localhost logs olatdata webapp
+# Create necessary OpenOlat directories
+RUN mkdir -p lib conf/Catalina/localhost logs olatdata
 
-# olat.local.properties
+# Generate olat.local.properties from template
 COPY ./config/lib/olat.local.properties.template lib/olat.local.properties.template
 RUN envsubst < lib/olat.local.properties.template > lib/olat.local.properties && rm lib/olat.local.properties.template
 
-# ROOT.xml
+# Generate ROOT.xml from template
 COPY ./config/conf/Catalina/localhost/ROOT.template.xml conf/Catalina/localhost/
 RUN envsubst < conf/Catalina/localhost/ROOT.template.xml > conf/Catalina/localhost/ROOT.xml \
     && rm conf/Catalina/localhost/ROOT.template.xml
 
-# log4j2.xml
+# Copy log4j2 configuration
 COPY ./config/lib/log4j2.xml lib/log4j2.xml
 
-# Create non-root user and set proper permissions
-RUN useradd -m -U -d /home/openolat -s /bin/bash openolat \
-    && chgrp -R 0 /usr/local/tomcat \
-    && chmod -R g+rwX /usr/local/tomcat
-
+# Create non-root user and set appropriate permissions for OpenOLAT runtime
+RUN useradd -U -d /home/openolat -s /bin/bash openolat && mkdir -p /home/openolat && chown openolat:openolat /home/openolat
 # Switch to non-root user for security
 USER openolat
 
