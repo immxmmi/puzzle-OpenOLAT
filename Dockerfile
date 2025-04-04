@@ -11,7 +11,7 @@ RUN mvn --no-transfer-progress clean package -DskipTests \
 RUN ls -la /build/target
 
 # Runtime stage
-FROM tomcat:10.1.35-jre17
+FROM tomcat:10.1-jre17
 
 # Prepare system packages
 RUN apt-get update \
