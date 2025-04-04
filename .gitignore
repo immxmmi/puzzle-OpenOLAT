@@ -4,6 +4,7 @@
 /screenshots/
 /.settings/
 /.externalToolBuilders/
+/openolat-logs/
 
 # deprecated scripting files
 *.pl
