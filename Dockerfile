@@ -1,25 +1,35 @@
 # Build stage
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /build
-COPY . .
-RUN mvn clean package -DskipTests
+COPY pom.xml .
+COPY scripts ./scripts
+COPY src ./src
+COPY .git .git
+COPY NOTICE.TXT NOTICE.TXT
+RUN mvn --no-transfer-progress clean package -DskipTests \
+    && rm -rf /root/.m2/repository
+RUN ls -la /build/target
 
 # Runtime stage
-FROM tomcat:10.1.35-jdk17
+FROM tomcat:10.1.35-jre17
 
 # Prepare system packages
-RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext-base unzip \
+    && apt-get purge -y && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 
 WORKDIR /usr/local/tomcat
+RUN chmod -R 777 /usr/local/tomcat
 
 # Copy the built WAR file from the builder stage and extract it into the webapp directory
 COPY --from=builder /build/target/*.war webapp/ROOT.war
-RUN jar xf webapp/ROOT.war \
-    && rm webapp/ROOT.war
+RUN unzip webapp/ROOT.war -d webapp && rm webapp/ROOT.war
 
 # Copy setenv.sh configuration
 COPY ./config/bin/setenv.sh bin/setenv.sh
@@ -33,7 +43,7 @@ COPY ./config/bin/start.sh bin/start.sh
 RUN chmod +x bin/start.sh
 
 # Create necessary OpenOlat directories
-RUN mkdir -p lib conf/Catalina/localhost logs olatdata webapp
+RUN mkdir -p lib conf/Catalina/localhost logs olatdata
 
 # Generate olat.local.properties from template
 COPY ./config/lib/olat.local.properties.template lib/olat.local.properties.template
@@ -48,10 +58,7 @@ RUN envsubst < conf/Catalina/localhost/ROOT.template.xml > conf/Catalina/localho
 COPY ./config/lib/log4j2.xml lib/log4j2.xml
 
 # Create non-root user and set appropriate permissions for OpenOLAT runtime
-RUN useradd -m -U -d /home/openolat -s /bin/bash openolat \
-    && chgrp -R 0 /usr/local/tomcat \
-    && chmod -R g+rwX /usr/local/tomcat
-
+RUN useradd -U -d /home/openolat -s /bin/bash openolat && mkdir -p /home/openolat && chown openolat:openolat /home/openolat
 # Switch to non-root user for security
 USER openolat
 
