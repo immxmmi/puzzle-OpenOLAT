@@ -1,71 +1,71 @@
 services:
-  openolat:
-    build: .
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./openolat-logs:/usr/local/tomcat/logs
-    depends_on:
-      - postgres-db
-
-  
-  # openolat-manuell:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.release-based
-  #     args:
-  #       OPENOLAT_VERSION: 2001
+  # openolat:
+  #   build: .
   #   ports:
   #     - "8080:8080"
-  #   environment:
-  #     - DB_HOST=postgres-db
-  #     - DB_PORT=5432
-  #     - DB_USERNAME=openolat
-  #     - DB_PASSWORD=openolat
-  #     - DB_NAME=openolat
   #   volumes:
   #     - ./openolat-logs:/usr/local/tomcat/logs
   #   depends_on:
   #     - postgres-db
+
   
-  postgres-db:
+  openolat-manuell:
+    build:
+      context: .
+      dockerfile: Dockerfile.release-based
+      args:
+        OPENOLAT_VERSION: 2001
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_USERNAME=openolat
+      - DB_PASSWORD=openolat
+      - DB_NAME=openolat
+    volumes:
+      - ./openolat-logs:/usr/local/tomcat/logs
+    depends_on:
+      - openolat-postgresql
+  
+  openolat-postgresql:
     image: postgres:17
     environment:
       POSTGRES_USER: openolat
       POSTGRES_PASSWORD: openolat
-      POSTGRES_DB: secret
+      POSTGRES_DB: openolat
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
-  loki:
-    image: grafana/loki:2.9.1
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+  # loki:
+  #   image: grafana/loki:2.9.1
+  #   ports:
+  #     - "3100:3100"
+  #   command: -config.file=/etc/loki/local-config.yaml
 
-  promtail:
-    image: grafana/promtail:2.9.1
-    volumes:
-      - /var/log:/var/log
-      - ./config/promtail/promtail-config.yml:/etc/promtail/promtail.yml
-      - ./openolat-logs:/usr/local/tomcat/logs
-    command: -config.file=/etc/promtail/promtail.yml
-    depends_on:
-      - loki
+  # promtail:
+  #   image: grafana/promtail:2.9.1
+  #   volumes:
+  #     - /var/log:/var/log
+  #     - ./config/promtail/promtail-config.yml:/etc/promtail/promtail.yml
+  #     - ./openolat-logs:/usr/local/tomcat/logs
+  #   command: -config.file=/etc/promtail/promtail.yml
+  #   depends_on:
+  #     - loki
 
-  grafana:
-    image: grafana/grafana:10.2.3
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    depends_on:
-      - loki
+  # grafana:
+  #   image: grafana/grafana:10.2.3
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana-storage:/var/lib/grafana
+  #   depends_on:
+  #     - loki
 
   pgadmin:
     image: dpage/pgadmin4
@@ -77,7 +77,7 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
-      - postgres-db
+      - openolat-postgresql
 
 volumes:
   postgres-data:

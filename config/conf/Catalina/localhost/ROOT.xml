@@ -9,5 +9,5 @@
     validationQuery="SELECT 1"
     validationQueryTimeout="-1"
     testOnBorrow="true" testOnReturn="false"
-    url="jdbc:postgresql://postgres-db:5432/openolat" />
+    url="jdbc:postgresql://openolat-postgresql:5432/openolat" />
 </Context>
