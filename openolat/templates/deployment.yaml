@@ -19,3 +19,17 @@ spec:
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
         ports:
         - containerPort: 8080
+        volumeMounts:
+        - name: tomcat-root-xml
+          mountPath: /usr/local/tomcat/conf/Catalina/localhost/ROOT.xml
+          subPath: ROOT.xml
+        - name: openolat-config
+          mountPath: /usr/local/tomcat/lib/olat.local.properties.template
+          subPath: olat.properties
+      volumes:
+      - name: tomcat-root-xml
+        configMap:
+          name: {{ .Release.Name }}-tomcat-root
+      - name: openolat-config
+        configMap:
+          name: {{ .Release.Name }}-openolat-config

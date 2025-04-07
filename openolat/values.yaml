@@ -2,6 +2,22 @@ deployment:
   image: ghcr.io/immxmmi/openolat
   tag: dev-latest
   replicas: 1
+  db:
+    host: "postgresql.default.svc.cluster.local"
+    port: 5432
+    name: "openolat"
+    username: "openolat"
+    password: "secret"
+  openolatConfig:
+    installationDir: "/home/openolat"
+    logDir: "/home/openolat/logs"
+    contextPath: "/openolat"
+    domainName: "localhost"
+    port: 8088
+    sslPort: 0
+    smtpHost: "disabled"
+    tomcatId: 1
+    userdataDir: "/home/openolat/olatdata"
 
 service:
   port: 8080

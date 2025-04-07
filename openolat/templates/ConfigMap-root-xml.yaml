@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-tomcat-root
+  labels:
+    {{- include "openolat.labels" . | nindent 4 }}
+data:
+  ROOT.xml: |
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <Context path="" docBase="/usr/local/tomcat/webapp" debug="0" reloadable="false" allowLinking="true">
+      <Resource name="jdbc/OpenOLATDS" auth="Container" type="javax.sql.DataSource"
+        maxTotal="16" maxIdle="4" maxWaitMillis="60000"
+        username="{{ .Values.deployment.db.username }}"
+        password="{{ .Values.deployment.db.password }}"
+        driverClassName="org.postgresql.Driver"
+        validationQuery="SELECT 1"
+        validationQueryTimeout="-1"
+        testOnBorrow="true" testOnReturn="false"
+        url="jdbc:postgresql://{{ .Values.deployment.db.host }}:{{ .Values.deployment.db.port }}/{{ .Values.deployment.db.name }}" />
+    </Context>
