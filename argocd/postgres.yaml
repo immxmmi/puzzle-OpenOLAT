@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openolat-postgresql
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: 13.2.22
+    helm:
+      parameters:
+        - name: image.tag
+          value: 17.2.0
+        - name: auth.username
+          value: openolat
+        - name: auth.password
+          value: openolat
+        - name: auth.database
+          value: openolat
+        - name: primary.service.ports.postgresql
+          value: "5432"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openolat
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
