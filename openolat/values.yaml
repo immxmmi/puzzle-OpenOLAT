@@ -9,6 +9,10 @@ deployment:
     username: "openolat"
     password: "secret"
   openolatConfig:
+    db:
+      source: "jndi"
+      jndi: "java:comp/env/jdbc/openolatDS"
+      vendor: "postgresql"
     installationDir: "/home/openolat"
     logDir: "/home/openolat/logs"
     contextPath: "/openolat"

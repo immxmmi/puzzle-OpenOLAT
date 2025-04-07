@@ -6,9 +6,9 @@ metadata:
     {{- include "openolat.labels" . | nindent 4 }}
 data:
   olat.properties: |
-    db.source=jndi
-    db.jndi=java:comp/env/jdbc/openolatDS
-    db.vendor=postgresql
+    db.source={{ .Values.deployment.openolatConfig.db.source }}
+    db.jndi={{ .Values.deployment.openolatConfig.db.jndi }}
+    db.vendor={{ .Values.deployment.openolatConfig.db.vendor }}
     installation.dir={{ .Values.deployment.openolatConfig.installationDir }}
     log.dir={{ .Values.deployment.openolatConfig.logDir }}
     server.contextpath={{ .Values.deployment.openolatConfig.contextPath }}
