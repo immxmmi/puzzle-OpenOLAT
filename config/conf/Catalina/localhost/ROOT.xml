@@ -2,10 +2,10 @@
 <Context path="" docBase="/usr/local/tomcat/webapp" debug="0" reloadable="false" allowLinking="true">
   <Resource name="jdbc/OpenOLATDS" auth="Container" type="javax.sql.DataSource"
     maxTotal="16" maxIdle="4" maxWaitMillis="60000"
-    username="${DB_USERNAME}" password="${DB_PASSWORD}"
+    username="openolat" password="openolat"
     driverClassName="org.postgresql.Driver"
     validationQuery="SELECT 1"
     validationQueryTimeout="-1"
     testOnBorrow="true" testOnReturn="false"
-    url="jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}" />
+    url="jdbc:postgresql://postgres-db:5432/openolat" />
 </Context>

@@ -15,4 +15,4 @@ scrape_configs:
           - localhost
         labels:
           job: openolat
-          __path__: /var/log/openolat/*.log
+          __path__: /usr/local/tomcat/logs/*.log

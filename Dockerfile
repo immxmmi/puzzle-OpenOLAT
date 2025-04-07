@@ -45,14 +45,11 @@ RUN chmod +x bin/start.sh
 # Create necessary OpenOlat directories
 RUN mkdir -p lib conf/Catalina/localhost logs olatdata
 
-# Generate olat.local.properties from template
-COPY ./config/lib/olat.local.properties.template lib/olat.local.properties.template
-RUN envsubst < lib/olat.local.properties.template > lib/olat.local.properties && rm lib/olat.local.properties.template
+# COPY olat.local.properties from template
+COPY ./config/lib/olat.local.properties lib/olat.local.properties
 
-# Generate ROOT.xml from template
-COPY ./config/conf/Catalina/localhost/ROOT.template.xml conf/Catalina/localhost/
-RUN envsubst < conf/Catalina/localhost/ROOT.template.xml > conf/Catalina/localhost/ROOT.xml \
-    && rm conf/Catalina/localhost/ROOT.template.xml
+# COPY ROOT.xml from template
+COPY ./config/conf/Catalina/localhost/ROOT.xml conf/Catalina/localhost/
 
 # Copy log4j2 configuration
 COPY ./config/lib/log4j2.xml lib/log4j2.xml

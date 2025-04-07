@@ -29,6 +29,8 @@ services:
   #     - DB_USERNAME=openolat
   #     - DB_PASSWORD=openolat
   #     - DB_NAME=openolat
+  #   volumes:
+  #     - ./openolat-logs:/usr/local/tomcat/logs
   #   depends_on:
   #     - postgres-db
   
@@ -53,7 +55,7 @@ services:
     image: grafana/promtail:2.9.1
     volumes:
       - /var/log:/var/log
-      - ./promtail-config.yml:/etc/promtail/promtail.yml
+      - ./config/promtail/promtail-config.yml:/etc/promtail/promtail.yml
       - ./openolat-logs:/usr/local/tomcat/logs
     command: -config.file=/etc/promtail/promtail.yml
     depends_on:
@@ -71,6 +73,19 @@ services:
     depends_on:
       - loki
 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres-db
+
 volumes:
   postgres-data:
   grafana-storage:
+  pgadmin-data:
