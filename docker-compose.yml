@@ -3,12 +3,6 @@ services:
     build: .
     ports:
       - "8080:8080"
-    environment:
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_USERNAME=openolat
-      - DB_PASSWORD=openolat
-      - DB_NAME=openolat
     volumes:
       - ./openolat-logs:/usr/local/tomcat/logs
     depends_on:
@@ -39,7 +33,7 @@ services:
     environment:
       POSTGRES_USER: openolat
       POSTGRES_PASSWORD: openolat
-      POSTGRES_DB: openolat
+      POSTGRES_DB: secret
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
