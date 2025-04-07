@@ -40,4 +40,6 @@ openolat_shell:
 		kubectl -n openolat exec -it $$POD -- /bin/bash || kubectl -n openolat exec -it $$POD -- /bin/sh; \
 	fi
 
-.PHONY: help argocd_install argocd_password argocd_start argocd_deploy_openolat
+openolat_start:
+	@kubectl port-forward services/openolat-svc -n openolat 8087:8080 > /dev/null 2>&1 &
+	@echo "OpenOLAT is available at http://localhost:8087/"
