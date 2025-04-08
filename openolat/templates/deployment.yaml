@@ -37,8 +37,10 @@ spec:
           mountPath: /home/openolat/olatdata
       volumes:
       - name: tomcat-root-xml
-        configMap:
-          name: {{ .Release.Name }}-tomcat-root
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Release.Name }}-root-xml
+            key: xml-value
       - name: openolat-config
         configMap:
           name: {{ .Release.Name }}-openolat-config
