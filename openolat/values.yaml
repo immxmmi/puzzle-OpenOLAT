@@ -22,6 +22,14 @@ deployment:
     smtpHost: "disabled"
     tomcatId: 1
     userdataDir: "/home/openolat/olatdata"
+    userdataDirSize: "1Gi"
+  resources:
+    limits:
+      memory: "10Gi"
+      cpu: "4"
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
 
 service:
   port: 8080
