@@ -15,7 +15,7 @@ FROM tomcat:10.1-jre17
 
 # Prepare system packages
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gettext-base unzip \
+    && apt-get install -y --no-install-recommends gettext-base unzip ffmpeg handbrake-cli \
     && apt-get purge -y && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -55,7 +55,7 @@ COPY ./config/conf/Catalina/localhost/ROOT.xml conf/Catalina/localhost/
 COPY ./config/lib/log4j2.xml lib/log4j2.xml
 
 # Create non-root user and set appropriate permissions for OpenOLAT runtime
-RUN useradd -U -d /home/openolat -s /bin/bash openolat && mkdir -p /home/openolat && chown openolat:openolat /home/openolat
+RUN useradd -m -s /bin/bash openolat
 # Switch to non-root user for security
 USER openolat
 
