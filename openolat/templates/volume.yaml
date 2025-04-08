@@ -7,7 +7,6 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  reclaimPolicy: Retain
   resources:
     requests:
       storage: {{ .Values.deployment.openolatConfig.userdataDirSize }}
