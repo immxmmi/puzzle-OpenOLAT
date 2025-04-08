@@ -2,4 +2,4 @@ apiVersion: v2
 name: openolat
 description: OpenOlat is a modular web-based e-learning platform (LMS).
 type: application
-version: 1.0.3
+version: 1.0.4
