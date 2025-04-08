@@ -43,21 +43,3 @@ openolat_shell:
 openolat_start:
 	@kubectl port-forward services/openolat-svc -n openolat 8087:8080 > /dev/null 2>&1 &
 	@echo "OpenOLAT is available at http://localhost:8087/"
-
-
-registry_deploy:
-	@echo "Deploying Registry ..."
-	@kubectl apply -f argocd/registry.yaml
-	@echo "Registry deployed!"
-
-registry_open:
-	@echo "Opening Registry ..."
-	@kubectl port-forward -n zot services/zot-registry 5100:5000 > /dev/null 2>&1 &
-	@echo "Registry is available at http://localhost:5100/"
-
-registry_test:
-	@echo "Testing Registry ..."
-	@kubectl port-forward -n zot services/zot-registry 5100:5000 & \
-	sleep 3 && \
-	curl -s http://localhost:5100/v2/_catalog || echo "❌ Registry not responding"
-	@echo "✅ Registry test complete (check output above)."
