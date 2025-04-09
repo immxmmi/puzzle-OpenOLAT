@@ -11,6 +11,7 @@ pipeline {
     ZOT_OCI_URL = "oci://${ZOT_REGISTRY}/openolat"
     //DOCKERFILE_NAME = "Dockerfile"
     DOCKERFILE_NAME = "Dockerfile.release-based"
+    OPENOLAT_VERSION=2001
   }
 
   stages {
