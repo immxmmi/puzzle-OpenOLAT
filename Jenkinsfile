@@ -30,11 +30,11 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
-      steps {
-        sh "docker build -f ${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${VERSION_TAG} ."
-      }
-    }
+//    stage('Build Docker Image') {
+//      steps {
+//        sh "docker build -f ${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${VERSION_TAG} ."
+//      }
+//    }
 
     stage('Push to Local Zot Registry') {
       steps {
