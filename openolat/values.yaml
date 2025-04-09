@@ -22,7 +22,10 @@ deployment:
     smtpHost: "disabled"
     tomcatId: 1
     userdataDir: "/home/openolat/olatdata"
-    userdataDirSize: "1Gi"
+    # If userdataDirExistingVolumeClaimName is set, no VolumeClaim will be created
+    userdataDirExistingVolumeClaimName: ""
+    # Only used if userdataDirExistingVolumeClaimName is not set
+    userdataDirVolumeSize: "1Gi"
   resources:
     limits:
       memory: "10Gi"

@@ -47,4 +47,8 @@ spec:
           name: {{ .Release.Name }}-openolat-config
       - name: openolat-userdata
         persistentVolumeClaim:
+        {{- if .Values.deployment.openolatConfig.userdataDirExistingVolumeClaimName }}
+          claimName: {{ .Values.deployment.openolatConfig.userdataDirExistingVolumeClaimName }}
+        {{- else }}
           claimName: {{ .Release.Name }}-userdata-pvc
+        {{- end }}
