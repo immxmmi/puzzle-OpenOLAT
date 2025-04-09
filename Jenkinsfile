@@ -62,7 +62,7 @@ pipeline {
 
     stage('Push Helm Chart to Zot (OCI)') {
       steps {
-        sh "helm push chart.tgz ${ZOT_OCI_URL}"
+        sh "helm push chart.tgz ${ZOT_OCI_URL} --insecure-skip-tls-verify"
       }
     }
   }
