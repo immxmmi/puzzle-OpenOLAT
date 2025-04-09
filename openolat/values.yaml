@@ -2,6 +2,7 @@ deployment:
   image: ghcr.io/immxmmi/openolat
   tag: dev-latest
   replicas: 1
+  # Omit the db part if you are using cmp-secrets
   db:
     host: "openolat-postgresql.openolat.svc.cluster.local"
     port: 5432
@@ -39,3 +40,11 @@ service:
 
 ingress:
   hostname: "openolat.frentix.com"
+
+# Only relevant if deployment.db part has been omitted and you are using cmp-secrets
+#secrets:
+#  secretManager:
+#    externalSecrets:
+#    - path: "dev/root-xml"
+#      keys:
+#        - property: "xml-value"

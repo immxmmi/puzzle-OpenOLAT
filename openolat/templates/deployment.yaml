@@ -38,7 +38,7 @@ spec:
       volumes:
       - name: tomcat-root-xml
         secret:
-          secretName: {{ .Release.Name }}-root-xml
+          secretName: root-xml
           items:
           - key: xml-value
             path: ROOT.xml

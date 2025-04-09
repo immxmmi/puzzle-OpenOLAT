@@ -2,4 +2,10 @@ apiVersion: v2
 name: openolat
 description: OpenOlat is a modular web-based e-learning platform (LMS).
 type: application
-version: 1.0.6
+version: 1.0.7
+
+dependencies:
+  - name: cmp-secrets
+    alias: secrets
+    version: 1.2.4
+    repository: oci://cmp-registry.stzh.ch/cmp-charts/charts
