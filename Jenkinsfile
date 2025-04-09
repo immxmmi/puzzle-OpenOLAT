@@ -5,6 +5,11 @@ pipeline {
     IMAGE_NAME = "openolat"
     LATEST_TAG = "latest"
     BRANCH_NAME = "${env.BRANCH_NAME ?: 'dev'}"
+    ZOT_HOST = "zot"
+    ZOT_PORT = "5000"
+    ZOT_REGISTRY = "${ZOT_HOST}:${ZOT_PORT}"
+    ZOT_OCI_URL = "oci://${ZOT_REGISTRY}/openolat"
+    DOCKERFILE_NAME = "Dockerfile.release"
   }
 
   stages {
@@ -25,7 +30,7 @@ pipeline {
 
     stage('Build Docker Image') {
       steps {
-        sh "docker build -t ${IMAGE_NAME}:${VERSION_TAG} ."
+        sh "docker build -f ${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${VERSION_TAG} ."
       }
     }
 
@@ -33,11 +38,11 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'zot-local', usernameVariable: 'REGISTRY_USER', passwordVariable: 'REGISTRY_PASS')]) {
           sh """
-            echo \$REGISTRY_PASS | docker login localhost:5701 -u \$REGISTRY_USER --password-stdin
-            docker tag ${IMAGE_NAME}:${VERSION_TAG} localhost:5701/openolat:${VERSION_TAG}
-            docker tag ${IMAGE_NAME}:${VERSION_TAG} localhost:5701/openolat:${BRANCH_NAME}-${LATEST_TAG}
-            docker push localhost:5701/openolat:${VERSION_TAG}
-            docker push localhost:5701/openolat:${BRANCH_NAME}-${LATEST_TAG}
+            echo \$REGISTRY_PASS | docker login ${ZOT_REGISTRY} -u \$REGISTRY_USER --password-stdin
+            docker tag ${IMAGE_NAME}:${VERSION_TAG} ${ZOT_REGISTRY}/openolat:${VERSION_TAG}
+            docker tag ${IMAGE_NAME}:${VERSION_TAG} ${ZOT_REGISTRY}/openolat:${BRANCH_NAME}-${LATEST_TAG}
+            docker push ${ZOT_REGISTRY}/openolat:${VERSION_TAG}
+            docker push ${ZOT_REGISTRY}/openolat:${BRANCH_NAME}-${LATEST_TAG}
           """
         }
       }
@@ -56,7 +61,7 @@ pipeline {
 
     stage('Push Helm Chart to Zot (OCI)') {
       steps {
-        sh "helm push chart.tgz oci://localhost:5701/openolat"
+        sh "helm push chart.tgz ${ZOT_OCI_URL}"
       }
     }
   }
