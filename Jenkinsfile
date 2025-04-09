@@ -5,13 +5,6 @@ pipeline {
     IMAGE_NAME = "openolat"
     LATEST_TAG = "latest"
     BRANCH_NAME = "${env.BRANCH_NAME ?: 'dev'}"
-    ZOT_HOST = "zot"
-    ZOT_PORT = "5000"
-    ZOT_REGISTRY = "${ZOT_HOST}:${ZOT_PORT}"
-    ZOT_OCI_URL = "oci://${ZOT_REGISTRY}/openolat"
-    DOCKERFILE_NAME = "Dockerfile"
-    //DOCKERFILE_NAME = "Dockerfile.release-based"
-    //OPENOLAT_VERSION=2001
   }
 
   stages {
@@ -30,21 +23,21 @@ pipeline {
       }
     }
 
-//    stage('Build Docker Image') {
-//      steps {
-//        sh "docker build -f ${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${VERSION_TAG} ."
-//      }
-//    }
+    stage('Build Docker Image') {
+      steps {
+        sh "docker build -t ${IMAGE_NAME}:${VERSION_TAG} ."
+      }
+    }
 
     stage('Push to Local Zot Registry') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'zot-local', usernameVariable: 'REGISTRY_USER', passwordVariable: 'REGISTRY_PASS')]) {
           sh """
-            echo \$REGISTRY_PASS | docker login ${ZOT_REGISTRY} -u \$REGISTRY_USER --password-stdin
-            docker tag ${IMAGE_NAME}:${VERSION_TAG} ${ZOT_REGISTRY}/openolat:${VERSION_TAG}
-            docker tag ${IMAGE_NAME}:${VERSION_TAG} ${ZOT_REGISTRY}/openolat:${BRANCH_NAME}-${LATEST_TAG}
-            docker push ${ZOT_REGISTRY}/openolat:${VERSION_TAG}
-            docker push ${ZOT_REGISTRY}/openolat:${BRANCH_NAME}-${LATEST_TAG}
+            echo \$REGISTRY_PASS | docker login localhost:5701 -u \$REGISTRY_USER --password-stdin
+            docker tag ${IMAGE_NAME}:${VERSION_TAG} localhost:5701/openolat:${VERSION_TAG}
+            docker tag ${IMAGE_NAME}:${VERSION_TAG} localhost:5701/openolat:${BRANCH_NAME}-${LATEST_TAG}
+            docker push localhost:5701/openolat:${VERSION_TAG}
+            docker push localhost:5701/openolat:${BRANCH_NAME}-${LATEST_TAG}
           """
         }
       }
@@ -55,7 +48,6 @@ pipeline {
         sh """
           curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm lint openolat
-          helm dependency update openolat
           helm package openolat
           mv *.tgz chart.tgz
         """
@@ -64,7 +56,7 @@ pipeline {
 
     stage('Push Helm Chart to Zot (OCI)') {
       steps {
-        sh "helm push chart.tgz ${ZOT_OCI_URL} --insecure-skip-tls-verify"
+        sh "helm push chart.tgz oci://localhost:5701/openolat"
       }
     }
   }
