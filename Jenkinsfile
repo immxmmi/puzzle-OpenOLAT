@@ -55,6 +55,7 @@ pipeline {
         sh """
           curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm lint openolat
+          helm dependency update openolat
           helm package openolat
           mv *.tgz chart.tgz
         """
