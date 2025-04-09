@@ -9,7 +9,8 @@ pipeline {
     ZOT_PORT = "5000"
     ZOT_REGISTRY = "${ZOT_HOST}:${ZOT_PORT}"
     ZOT_OCI_URL = "oci://${ZOT_REGISTRY}/openolat"
-    DOCKERFILE_NAME = "Dockerfile.release"
+    //DOCKERFILE_NAME = "Dockerfile"
+    DOCKERFILE_NAME = "Dockerfile.release-based"
   }
 
   stages {
