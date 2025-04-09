@@ -29,6 +29,20 @@ pipeline {
       }
     }
 
+    stage('Push to Local Zot Registry') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'zot-local', usernameVariable: 'REGISTRY_USER', passwordVariable: 'REGISTRY_PASS')]) {
+          sh """
+            echo \$REGISTRY_PASS | docker login localhost:5701 -u \$REGISTRY_USER --password-stdin
+            docker tag ${IMAGE_NAME}:${VERSION_TAG} localhost:5701/openolat:${VERSION_TAG}
+            docker tag ${IMAGE_NAME}:${VERSION_TAG} localhost:5701/openolat:${BRANCH_NAME}-${LATEST_TAG}
+            docker push localhost:5701/openolat:${VERSION_TAG}
+            docker push localhost:5701/openolat:${BRANCH_NAME}-${LATEST_TAG}
+          """
+        }
+      }
+    }
+
     stage('Helm Lint & Package') {
       steps {
         sh """
@@ -37,6 +51,12 @@ pipeline {
           helm package openolat
           mv *.tgz chart.tgz
         """
+      }
+    }
+
+    stage('Push Helm Chart to Zot (OCI)') {
+      steps {
+        sh "helm push chart.tgz oci://localhost:5701/openolat"
       }
     }
   }
