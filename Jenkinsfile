@@ -1,5 +1,5 @@
 pipeline {
-  agent any
+  agent { label 'agentA && docker && helm' }
 
   environment {
     IMAGE_NAME = "openolat"
