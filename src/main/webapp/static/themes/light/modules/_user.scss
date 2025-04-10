@@ -377,6 +377,11 @@
 	}
 }
 
+.o_user_card_elements > p {
+	padding-bottom: 0 !important;
+	padding-top: 0 !important;
+}
+
 div.o_skype_button {
 	display:inline-block;
 	p {
@@ -547,6 +552,12 @@ dialog.popover {
 	.o_org_selector_selection_text {
 		margin-top: 14px;
 		font-weight: bold;
+	}
+	
+	.o_org_selector_selection_links {
+		margin-top: 7px;
+		display: flex;
+		gap: 14px;
 	}
 
 	.o_org_selector_selection.o_filter_search_list_values {
