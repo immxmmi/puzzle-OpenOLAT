@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Description: Tags and pushes Docker image to a Registry
 
 set -e

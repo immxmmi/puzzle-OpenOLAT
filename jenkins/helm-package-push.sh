@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Description: Installs Helm, lints chart, updates dependencies, packages and pushes to OCI Registry
 
 set -e
