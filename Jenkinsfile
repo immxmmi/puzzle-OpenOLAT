@@ -24,13 +24,17 @@ pipeline {
       }
     }
 
+    stage('Check Registry Availability') {
+      steps {
+        sh 'chmod +x ./jenkins/check-registry.sh'
+        sh './jenkins/check-registry.sh ${params.REGISTRY_HOST} ${params.REGISTRY_PORT}'
+      }
+    }
+
     stage('Extract Version') {
       steps {
-        script {
-          sh 'chmod +x ./jenkins/get-version.sh'
-          def version = sh(script: "./jenkins/get-version.sh", returnStdout: true).trim()
-          env.VERSION_TAG = version
-        }
+        sh 'chmod +x ./jenkins/get-version.sh'
+        env.VERSION_TAG = sh(script: './jenkins/get-version.sh', returnStdout: true).trim()
       }
     }
 
@@ -43,7 +47,11 @@ pipeline {
 
     stage('Push Docker Image to Registry') {
       steps {
-        withCredentials([usernamePassword(credentialsId: "${params.CREDENTIALS_ID}", usernameVariable: 'REGISTRY_USER', passwordVariable: 'REGISTRY_PASS')]) {
+        withCredentials([usernamePassword(
+          credentialsId: "${params.CREDENTIALS_ID}", 
+          usernameVariable: 'REGISTRY_USER', 
+          passwordVariable: 'REGISTRY_PASS'
+        )]) {
           sh "chmod +x ./jenkins/docker-push.sh"
           sh "./jenkins/docker-push.sh ${params.IMAGE_NAME} ${env.VERSION_TAG} ${env.BRANCH_NAME} ${REGISTRY_URL} $REGISTRY_USER $REGISTRY_PASS"
         }
