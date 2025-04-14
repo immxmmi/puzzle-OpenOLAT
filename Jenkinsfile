@@ -1,70 +1,83 @@
 pipeline {
   agent { label 'agentA && docker && helm' }
 
+  parameters {
+    string(name: 'REGISTRY_HOST',  defaultValue: 'zot', description: 'Registry Host (e.g. zot, ghcr.io)')
+    string(name: 'REGISTRY_PORT',  defaultValue: '5000', description: 'Registry Port (e.g. 5000, leave empty if not needed)')
+    string(name: 'DOCKERFILE_NAME', defaultValue: 'Dockerfile', description: 'Dockerfile to use')
+    string(name: 'CHART_DIR',       defaultValue: 'openolat', description: 'Helm chart directory')
+    string(name: 'IMAGE_NAME',      defaultValue: 'openolat', description: 'Name of the Docker image and Helm package')
+    string(name: 'CREDENTIALS_ID',  defaultValue: 'zot-local', description: 'Jenkins credentials ID for registry login')
+    string(name: 'VERSION_TAG',      defaultValue: '', description: 'Optional: override image version (leave empty to auto-detect)')
+  }
+
   environment {
-    IMAGE_NAME = "openolat"
     LATEST_TAG = "latest"
     BRANCH_NAME = "${env.BRANCH_NAME ?: 'dev'}"
-    ZOT_HOST = "zot"
-    ZOT_PORT = "5000"
-    ZOT_REGISTRY = "${ZOT_HOST}:${ZOT_PORT}"
-    ZOT_OCI_URL = "oci://${ZOT_REGISTRY}/openolat"
-    DOCKERFILE_NAME = "Dockerfile"
-    //DOCKERFILE_NAME = "Dockerfile.release-based"
-    //OPENOLAT_VERSION=2001
+    REGISTRY_URL = "${params.REGISTRY_PORT ? "${params.REGISTRY_HOST}:${params.REGISTRY_PORT}" : "${params.REGISTRY_HOST}"}"
+    OCI_REGISTRY_URL = "oci://${REGISTRY_URL}/${params.IMAGE_NAME}"
   }
 
   stages {
-    stage('Checkout') {
+    stage('Checkout Source') {
       steps {
         checkout scm
       }
     }
 
-    stage('Read Version from olat.properties') {
+    stage('Check Registry Availability') {
+      steps {
+        sh "nc -z -v ${params.REGISTRY_HOST} ${params.REGISTRY_PORT}"
+      }
+    } 
+
+    stage('Extract Version') {
       steps {
         script {
-          def version = sh(script: "grep '^build.version' src/main/resources/serviceconfig/olat.properties | cut -d'=' -f2", returnStdout: true).trim()
-          env.VERSION_TAG = version
+          if (!params.VERSION_TAG?.trim()) {
+            sh 'chmod +x ./jenkins/get-version.sh'
+            env.VERSION_TAG = sh(script: './jenkins/get-version.sh', returnStdout: true).trim()
+          } else {
+            env.VERSION_TAG = params.VERSION_TAG.trim()
+          }
         }
       }
     }
 
     stage('Build Docker Image') {
       steps {
-        sh "docker build -f ${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${VERSION_TAG} ."
+        sh "chmod +x ./jenkins/build-image.sh"
+        sh "./jenkins/build-image.sh ${params.DOCKERFILE_NAME} ${params.IMAGE_NAME} ${env.VERSION_TAG}"
       }
     }
 
-    stage('Push to Local Zot Registry') {
+    stage('Push Docker Image to Registry') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'zot-local', usernameVariable: 'REGISTRY_USER', passwordVariable: 'REGISTRY_PASS')]) {
-          sh """
-            echo \$REGISTRY_PASS | docker login ${ZOT_REGISTRY} -u \$REGISTRY_USER --password-stdin
-            docker tag ${IMAGE_NAME}:${VERSION_TAG} ${ZOT_REGISTRY}/openolat:${VERSION_TAG}
-            docker tag ${IMAGE_NAME}:${VERSION_TAG} ${ZOT_REGISTRY}/openolat:${BRANCH_NAME}-${LATEST_TAG}
-            docker push ${ZOT_REGISTRY}/openolat:${VERSION_TAG}
-            docker push ${ZOT_REGISTRY}/openolat:${BRANCH_NAME}-${LATEST_TAG}
-          """
+        withCredentials([usernamePassword(
+          credentialsId: "${params.CREDENTIALS_ID}", 
+          usernameVariable: 'REGISTRY_USER', 
+          passwordVariable: 'REGISTRY_PASS'
+        )]) {
+          sh "chmod +x ./jenkins/docker-push.sh"
+          sh "./jenkins/docker-push.sh ${params.IMAGE_NAME} ${env.VERSION_TAG} ${env.BRANCH_NAME} ${REGISTRY_URL} $REGISTRY_USER $REGISTRY_PASS"
         }
       }
     }
 
-    stage('Helm Lint & Package') {
+    stage('Helm Package & Push') {
       steps {
-        sh """
-          curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-          helm lint openolat
-          helm package openolat
-          mv *.tgz chart.tgz
-        """
+        sh "chmod +x ./jenkins/helm-package-push.sh"
+        sh "./jenkins/helm-package-push.sh ${params.CHART_DIR} ${OCI_REGISTRY_URL}"
       }
     }
+  }
 
-    stage('Push Helm Chart to Zot (OCI)') {
-      steps {
-        sh "helm push chart.tgz ${ZOT_OCI_URL} --insecure-skip-tls-verify"
-      }
+  post {
+    success {
+      echo "✅ Build and push completed successfully."
+    }
+    failure {
+      echo "❌ Build failed. Check the stage logs for errors."
     }
   }
 }
