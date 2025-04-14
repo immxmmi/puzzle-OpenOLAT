@@ -18,7 +18,6 @@ pipeline {
   }
 
   stages {
-
     stage('Checkout Source') {
       steps {
         checkout scm
@@ -28,6 +27,7 @@ pipeline {
     stage('Extract Version') {
       steps {
         script {
+          sh 'chmod +x ./jenkins/get-version.sh'
           def version = sh(script: "./jenkins/get-version.sh", returnStdout: true).trim()
           env.VERSION_TAG = version
         }
@@ -36,6 +36,7 @@ pipeline {
 
     stage('Build Docker Image') {
       steps {
+        sh "chmod +x ./jenkins/build-image.sh"
         sh "./jenkins/build-image.sh ${params.DOCKERFILE_NAME} ${params.IMAGE_NAME} ${env.VERSION_TAG}"
       }
     }
@@ -43,19 +44,18 @@ pipeline {
     stage('Push Docker Image to Registry') {
       steps {
         withCredentials([usernamePassword(credentialsId: "${params.CREDENTIALS_ID}", usernameVariable: 'REGISTRY_USER', passwordVariable: 'REGISTRY_PASS')]) {
-          sh """
-            ./jenkins/docker-push.sh ${params.IMAGE_NAME} ${env.VERSION_TAG} ${env.BRANCH_NAME} ${REGISTRY_URL} \$REGISTRY_USER \$REGISTRY_PASS
-          """
+          sh "chmod +x ./jenkins/docker-push.sh"
+          sh "./jenkins/docker-push.sh ${params.IMAGE_NAME} ${env.VERSION_TAG} ${env.BRANCH_NAME} ${REGISTRY_URL} $REGISTRY_USER $REGISTRY_PASS"
         }
       }
     }
 
     stage('Helm Package & Push') {
       steps {
+        sh "chmod +x ./jenkins/helm-package-push.sh"
         sh "./jenkins/helm-package-push.sh ${params.CHART_DIR} ${OCI_REGISTRY_URL}"
       }
     }
-
   }
 
   post {
