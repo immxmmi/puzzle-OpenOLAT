@@ -25,24 +25,6 @@ pipeline {
       }
     }
 
-    stage('Check Registry Availability') {
-      steps {
-        script {
-          def host = params.REGISTRY_HOST
-          def port = params.REGISTRY_PORT
-          def address = port ? "${host}:${port}" : host
-          echo "🔍 Checking registry availability: ${address}"
-          def result = port ? sh(script: "nc -z -w 5 ${host} ${port}", returnStatus: true)
-                            : sh(script: "curl -sf https://${host}/v2/ >/dev/null", returnStatus: true)
-          if (result != 0) {
-            error "❌ Registry ${address} is not reachable. Aborting pipeline."
-          } else {
-            echo "✅ Registry ${address} is reachable."
-          }
-        }
-      }
-    }
-
     stage('Extract Version') {
       steps {
         script {
