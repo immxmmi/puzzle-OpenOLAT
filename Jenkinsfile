@@ -25,6 +25,12 @@ pipeline {
       }
     }
 
+    stage('Check Registry Availability') {
+      steps {
+        sh "nc -z -v ${params.REGISTRY_HOST} ${params.REGISTRY_PORT}"
+      }
+    } 
+
     stage('Extract Version') {
       steps {
         script {
