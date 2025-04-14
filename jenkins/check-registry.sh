@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Description: Check if a Docker registry is reachable
 
 HOST=$1
