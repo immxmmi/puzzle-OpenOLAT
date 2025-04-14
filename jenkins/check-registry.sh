@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# Description: Check if a Docker registry is reachable
 
 HOST=$1
 PORT=$2
@@ -8,8 +9,11 @@ if [ -z "$HOST" ]; then
   exit 1
 fi
 
-ADDRESS="$HOST"
-[ -n "$PORT" ] && ADDRESS="$HOST:$PORT"
+if [ -n "$PORT" ]; then
+  ADDRESS="$HOST:$PORT"
+else
+  ADDRESS="$HOST"
+fi
 
 echo "🔍 Checking registry availability: $ADDRESS"
 
