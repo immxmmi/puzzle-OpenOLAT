@@ -63,7 +63,6 @@ jobs:
       - name: Package Helm Chart
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-          helm dependency update openolat
           helm lint openolat
           helm package openolat
           mv *.tgz chart.tgz
