@@ -6,15 +6,15 @@ metadata:
     {{- include "openolat.labels" . | nindent 4 }}
 data:
   olat.properties: |
-    db.source={{ .Values.deployment.openolatConfig.db.source }}
-    db.jndi={{ .Values.deployment.openolatConfig.db.jndi }}
-    db.vendor={{ .Values.deployment.openolatConfig.db.vendor }}
-    installation.dir={{ .Values.deployment.openolatConfig.installationDir }}
-    log.dir={{ .Values.deployment.openolatConfig.logDir }}
-    server.contextpath={{ .Values.deployment.openolatConfig.contextPath }}
-    server.domainname={{ .Values.deployment.openolatConfig.domainName }}
-    server.port={{ .Values.deployment.openolatConfig.port }}
-    server.port.ssl={{ .Values.deployment.openolatConfig.sslPort }}
-    smtp.host={{ .Values.deployment.openolatConfig.smtpHost }}
-    tomcat.id={{ .Values.deployment.openolatConfig.tomcatId }}
-    userdata.dir={{ .Values.deployment.openolatConfig.userdataDir }}
+    db.source={{ .Values.database.source }}
+    db.jndi={{ .Values.database.jndi }}
+    db.vendor={{ .Values.database.vendor }}
+    installation.dir={{ .Values.config.installationDir }}
+    log.dir={{ .Values.config.logDir }}
+    server.contextpath={{ .Values.config.contextPath }}
+    server.domainname={{ .Values.config.domainName }}
+    server.port={{ .Values.config.port }}
+    server.port.ssl={{ .Values.config.sslPort }}
+    smtp.host={{ .Values.config.smtpHost }}
+    tomcat.id={{ .Values.config.tomcatId }}
+    userdata.dir={{ .Values.config.userdataDir }}

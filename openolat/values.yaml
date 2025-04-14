@@ -2,49 +2,50 @@ deployment:
   image: ghcr.io/immxmmi/openolat
   tag: dev-latest
   replicas: 1
-  # Omit the db part if you are using cmp-secrets
-  db:
-    host: "openolat-postgresql.openolat.svc.cluster.local"
-    port: 5432
-    name: "openolat"
-    username: "openolat"
-    password: "openolat"
-  openolatConfig:
-    db:
-      source: "jndi"
-      jndi: "java:comp/env/jdbc/openolatDS"
-      vendor: "postgresql"
-    installationDir: "/home/openolat"
-    logDir: "/home/openolat/logs"
-    contextPath: "/openolat"
-    domainName: "localhost"
-    port: 8088
-    sslPort: 0
-    smtpHost: "disabled"
-    tomcatId: 1
-    userdataDir: "/home/openolat/olatdata"
-    # If userdataDirExistingVolumeClaimName is set, no VolumeClaim will be created
-    userdataDirExistingVolumeClaimName: ""
-    # Only used if userdataDirExistingVolumeClaimName is not set
-    userdataDirVolumeSize: "1Gi"
-  resources:
-    limits:
-      memory: "10Gi"
-      cpu: "4"
-    requests:
-      memory: "1Gi"
-      cpu: "500m"
+
+
+config:
+  installationDir: "/home/openolat"
+  logDir: "/home/openolat/logs"
+  contextPath: "/openolat"
+  domainName: "localhost"
+  port: 8088
+  sslPort: 0
+  smtpHost: "disabled"
+  tomcatId: 1
+  userdataDir: "/home/openolat/olatdata"
+  # If userdataDirExistingVolumeClaimName is set, no VolumeClaim will be created
+  userdataDirExistingVolumeClaimName: ""
+  # Only used if userdataDirExistingVolumeClaimName is not set
+  userdataDirVolumeSize: "1Gi"
+
+
+database:
+  host: "openolat-postgresql.openolat.svc.cluster.local"
+  port: 5432
+  name: "openolat"
+  username: "openolat"
+  password: "openolat"
+  source: "jndi"
+  jndi: "java:comp/env/jdbc/openolatDS"
+  vendor: "postgresql"
+
+resources:
+  limits:
+    memory: "10Gi"
+    cpu: "4"
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
 
 service:
   port: 8080
+  targetPort: 8080
+  type: ClusterIP
 
 ingress:
+  enabled: false
   hostname: "openolat.frentix.com"
 
-# Only relevant if deployment.db part has been omitted and you are using cmp-secrets
-#secrets:
-#  secretManager:
-#    externalSecrets:
-#    - path: "dev/root-xml"
-#      keys:
-#        - property: "xml-value"
+secrets:
+  useExternalSecrets: false

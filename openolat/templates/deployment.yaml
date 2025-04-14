@@ -19,11 +19,11 @@ spec:
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
         resources:
           limits:
-            memory: {{ .Values.deployment.resources.limits.memory }}
-            cpu: {{ .Values.deployment.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
           requests:
-            memory: {{ .Values.deployment.resources.requests.memory }}
-            cpu: {{ .Values.deployment.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
         ports:
         - containerPort: 8080
         volumeMounts:
@@ -47,8 +47,8 @@ spec:
           name: {{ .Release.Name }}-openolat-config
       - name: openolat-userdata
         persistentVolumeClaim:
-        {{- if .Values.deployment.openolatConfig.userdataDirExistingVolumeClaimName }}
-          claimName: {{ .Values.deployment.openolatConfig.userdataDirExistingVolumeClaimName }}
+        {{- if .Values.config.userdataDirExistingVolumeClaimName }}
+          claimName: {{ .Values.config.userdataDirExistingVolumeClaimName }}
         {{- else }}
           claimName: {{ .Release.Name }}-userdata-pvc
         {{- end }}

@@ -1,4 +1,4 @@
-{{- if not .Values.deployment.openolatConfig.userdataDirExistingVolumeClaimName }}
+{{- if not .Values.config.userdataDirExistingVolumeClaimName }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,5 +10,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.deployment.openolatConfig.userdataDirVolumeSize }}
+      storage: {{ .Values.config.userdataDirVolumeSize }}
 {{- end }}

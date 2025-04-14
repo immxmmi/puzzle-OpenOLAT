@@ -9,4 +9,6 @@ spec:
     {{- include "openolat.selectorLabels" . | nindent 4 }}
   ports:
     - protocol: TCP
-      port: 8080
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort | default .Values.service.port }}
+  type: {{ .Values.service.type | default "ClusterIP" }}
