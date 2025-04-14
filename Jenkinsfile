@@ -8,6 +8,7 @@ pipeline {
     string(name: 'CHART_DIR',       defaultValue: 'openolat', description: 'Helm chart directory')
     string(name: 'IMAGE_NAME',      defaultValue: 'openolat', description: 'Name of the Docker image and Helm package')
     string(name: 'CREDENTIALS_ID',  defaultValue: 'zot-local', description: 'Jenkins credentials ID for registry login')
+    string(name: 'VERSION_TAG',      defaultValue: '', description: 'Optional: override image version (leave empty to auto-detect)')
   }
 
   environment {
@@ -33,8 +34,14 @@ pipeline {
 
     stage('Extract Version') {
       steps {
-        sh 'chmod +x ./jenkins/get-version.sh'
-        env.VERSION_TAG = sh(script: './jenkins/get-version.sh', returnStdout: true).trim()
+        script {
+          if (!params.VERSION_TAG?.trim()) {
+            sh 'chmod +x ./jenkins/get-version.sh'
+            env.VERSION_TAG = sh(script: './jenkins/get-version.sh', returnStdout: true).trim()
+          } else {
+            env.VERSION_TAG = params.VERSION_TAG.trim()
+          }
+        }
       }
     }
 
