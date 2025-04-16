@@ -1,5 +1,5 @@
 /**
- * <a href="http://www.openolat.org">
+ * <a href="https://www.openolat.org">
  * OpenOLAT - Online Learning and Training</a><br>
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); <br>
@@ -14,7 +14,7 @@
  * limitations under the License.
  * <p>
  * Initial code contributed and copyrighted by<br>
- * frentix GmbH, http://www.frentix.com
+ * frentix GmbH, https://www.frentix.com
  * <p>
  */
 package org.olat.basesecurity.manager;
@@ -48,7 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * 
  * Initial date: 19 mars 2018<br>
- * @author srosse, stephane.rosse@frentix.com, http://www.frentix.com
+ * @author srosse, stephane.rosse@frentix.com, https://www.frentix.com
  *
  */
 public class OrganisationServiceTest extends OlatTestCase {
@@ -94,7 +94,69 @@ public class OrganisationServiceTest extends OlatTestCase {
 		Assert.assertNotNull(administrators);
 		Assert.assertFalse(administrators.isEmpty());
 	}
-	
+
+	@Test
+	public void shouldDetectMultipleOrganisationsWithSameId() {
+		Organisation firstSameOrg = organisationService.createOrganisation(
+				"First same org", "same_org",
+				null, null, null, JunitTestHelper.getDefaultActor());
+		// Setup second organisation with the same identifier
+		Organisation secondSameOrg = organisationService.createOrganisation(
+				"Second same org", "same_org",
+				null, null, null, JunitTestHelper.getDefaultActor());
+		dbInstance.commitAndCloseSession();
+
+		boolean multipleOrgsWithSameId = organisationService.hasMultipleOrganisationsWithSameId("same_org");
+		// delete afterwards
+		organisationService.deleteOrganisation(firstSameOrg, firstSameOrg, null);
+		organisationService.deleteOrganisation(secondSameOrg, secondSameOrg, null);
+		Assert.assertTrue(multipleOrgsWithSameId);
+	}
+
+	@Test
+	public void shouldCountExactGlobalRolesOutsideDefault() {
+		int before = organisationService.getGlobalRolesOutsideDefaultIdentities().size();
+
+		Organisation defaultOrg = organisationService.getDefaultOrganisation();
+		Organisation otherOrg = organisationService.createOrganisation("AltOrg", UUID.randomUUID().toString(), "", null, null, JunitTestHelper.getDefaultActor());
+
+		Identity user = JunitTestHelper.createAndPersistIdentityAsRndUser("global-multi-org");
+
+		// Assign sysadmin in both orgs
+		organisationService.addMember(defaultOrg, user, OrganisationRoles.sysadmin, GroupMembershipInheritance.root, JunitTestHelper.getDefaultActor());
+		organisationService.addMember(otherOrg, user, OrganisationRoles.sysadmin, GroupMembershipInheritance.root, JunitTestHelper.getDefaultActor());
+
+		// Assign poolmanager in only other org
+		organisationService.addMember(otherOrg, user, OrganisationRoles.poolmanager, GroupMembershipInheritance.root, JunitTestHelper.getDefaultActor());
+		dbInstance.commitAndCloseSession();
+
+		int after = organisationService.getGlobalRolesOutsideDefaultIdentities().size();
+		Assert.assertEquals(1, after - before);
+	}
+
+	@Test
+	public void shouldMoveGlobalRolesToDefault() {
+		Organisation defaultOrg = organisationService.getDefaultOrganisation();
+		Organisation altOrg = organisationService.createOrganisation("MigratingOrg", UUID.randomUUID().toString(), "", null, null, JunitTestHelper.getDefaultActor());
+
+		// Add a global-role identity to the 'wrong' org
+		Identity globalUser = JunitTestHelper.createAndPersistIdentityAsRndUser("global-to-move");
+		organisationService.addMember(altOrg, globalUser, OrganisationRoles.poolmanager, GroupMembershipInheritance.root, JunitTestHelper.getDefaultActor());
+		dbInstance.commitAndCloseSession();
+
+		// Make sure it's not in default org
+		List<Long> defaultKeysBefore = organisationDao.getMemberKeys(defaultOrg, OrganisationRoles.poolmanager);
+		Assert.assertFalse(defaultKeysBefore.contains(globalUser.getKey()));
+
+		boolean moved = organisationService.moveGlobalRolesToDefault(null);
+		Assert.assertTrue(moved);
+		dbInstance.commitAndCloseSession();
+
+		// Now the identity should be in default org
+		List<Long> defaultKeysAfter = organisationDao.getMemberKeys(defaultOrg, OrganisationRoles.poolmanager);
+		Assert.assertTrue(defaultKeysAfter.contains(globalUser.getKey()));
+	}
+
 	@Test
 	public void addMembershipWithInheritance() {
 		Identity user = createRandomUser("Org. user");

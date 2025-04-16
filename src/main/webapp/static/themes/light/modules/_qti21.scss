@@ -525,6 +525,29 @@ span.o_qti_gaptext_score_alternative {
 	}
 }
 
+.o_labeled_light {
+	&.o_assessment_test_session_status_running {
+		font-weight: normal;
+		@extend %o_labeled_light_orange
+	}
+	&.o_assessment_test_session_status_suspended {
+		font-weight: normal;
+		@extend %o_labeled_light_blue
+	}
+	&.o_assessment_test_session_status_finished {
+		font-weight: normal;
+		@extend %o_labeled_light_green
+	}
+	&.o_assessment_test_session_status_error {
+		font-weight: normal;
+		@extend %o_labeled_light_red
+	}
+	&.o_assessment_test_session_status_cancelled {
+		font-weight: normal;
+		@extend %o_labeled_light_grey
+	}
+}
+
 
 /* Drawing */
 .o_draw_circle.o_qti_hotspot_correct, .o_draw_rectangle.o_qti_hotspot_correct {
@@ -1093,10 +1116,6 @@ table.o_qti_item_kprim {
 	position: relative;
 	padding: 0;
 	margin-top: 5px;
-}
-
-.source-top, target-top, .source-bottom, .target-bottom {
-
 }
 
 .o_match_dnd_sources {

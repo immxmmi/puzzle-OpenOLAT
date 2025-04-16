@@ -386,4 +386,34 @@ public interface OrganisationService {
 	 * Upgrade line manager roles to the new configuration (same as educationmanager) used in release 20, if needed.
 	 */
 	public void upgradeLineManagerRoles();
+
+
+	/**
+	 * 	Checks if there are multiple organisations with the same identifier.
+	 * 	There should normally be only one organisation with a unique identifier in the system.
+	 *
+	 * @param orgIdentifier the identifier to check
+	 * @return true if more than one organisation with the same identifier exists; false otherwise
+	 */
+	public boolean hasMultipleOrganisationsWithSameId(String orgIdentifier);
+
+	/**
+	 * Moves all global roles (e.g., sysadmin, groupmanager, poolmanager) from any non-default organisations
+	 * into the default organisation. This ensures global roles are only assigned within the default context.
+	 *
+	 * If a user already has the global role in the default organisation, it is not duplicated.
+	 * Any global role memberships in other organisations are removed.
+	 *
+	 * @param doer The identity performing this operation
+	 * @return true if the operation completes successfully; false otherwise
+	 */
+	public boolean moveGlobalRolesToDefault(Identity doer);
+
+	/**
+	 * Finds all identities that currently hold a global role (e.g., sysadmin, groupmanager, poolmanager)
+	 * but are not assigned to the default organisation.
+	 *
+	 * @return a list of identities with global roles outside the default organisation
+	 */
+	public List<Identity> getGlobalRolesOutsideDefaultIdentities();
 }

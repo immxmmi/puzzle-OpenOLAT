@@ -21,6 +21,8 @@ package org.olat.user;
 
 import java.util.Locale;
 
+import org.olat.core.CoreSpringFactory;
+import org.olat.core.dispatcher.mapper.MapperService;
 import org.olat.core.gui.UserRequest;
 import org.olat.core.gui.components.AbstractComponent;
 import org.olat.core.gui.components.ComponentRenderer;
@@ -36,17 +38,17 @@ import org.olat.core.util.Util;
 public class UserPortraitComponent extends AbstractComponent {
 	
 	private static final ComponentRenderer RENDERER = new UserPortraitRenderer();
+	private static final UserPortraitMapper MAPPER = new UserPortraitMapper();
 	
-	private final String avatarMapperUrl;
 	private final Translator compTranslator;
+	private String portraitMapperUrl;
 	private PortraitUser portraitUser;
 	private PortraitSize size = PortraitSize.medium;
-	private boolean displayPresence = true;
+	private boolean displayPresence = false;
 
-	protected UserPortraitComponent(String name, Locale locale, String avatarMapperUrl) {
+	protected UserPortraitComponent(String name, Locale locale) {
 		super(name);
-		this.avatarMapperUrl = avatarMapperUrl;
-		this.compTranslator = Util.createPackageTranslator(UserPortraitComponent.class, locale);
+		compTranslator = Util.createPackageTranslator(UserPortraitComponent.class, locale);
 	}
 
 	@Override
@@ -58,13 +60,18 @@ public class UserPortraitComponent extends AbstractComponent {
 	public ComponentRenderer getHTMLRendererSingleton() {
 		return RENDERER;
 	}
-	
-	String getAvatarMapperUrl() {
-		return avatarMapperUrl;
-	}
 
 	Translator getCompTranslator() {
 		return compTranslator;
+	}
+	
+	String getPortraitMapperUrl() {
+		if (portraitMapperUrl == null) {
+			// Small optimization to prevent unnecessary creations and registrations of the mapper.
+			// Can also be changed without implications if required (e.g. registration in the constructor of the component).
+			portraitMapperUrl = CoreSpringFactory.getImpl(MapperService.class).register(null, "user-portrait-mapper", MAPPER).getUrl();
+		}
+		return portraitMapperUrl;
 	}
 
 	public PortraitUser getPortraitUser() {
