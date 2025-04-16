@@ -34,7 +34,7 @@ spec:
           mountPath: /usr/local/tomcat/lib/olat.local.properties.template
           subPath: olat.properties
         - name: openolat-userdata
-          mountPath: /home/openolat/olatdata
+          mountPath: {{ .Values.config.userdataDir }}
       volumes:
       - name: tomcat-root-xml
         secret:
