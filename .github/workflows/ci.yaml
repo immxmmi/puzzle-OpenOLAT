@@ -3,12 +3,24 @@ name: CI/CD Pipeline for OpenOlat
 on:
   push:
     branches:
-      - main
+      - master
       - dev
+    paths:
+      - 'src/**'
+      - 'config/**'
+      - 'scripts/**'
+      - 'Dockerfile*'
+      - 'openolat/**'
   pull_request:
     branches:
-      - main
+      - master
       - dev
+    paths:
+      - 'src/**'
+      - 'config/**'
+      - 'scripts/**'
+      - 'Dockerfile*'
+      - 'openolat/**'
 
 permissions:
   packages: write
@@ -52,7 +64,7 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.BRANCH_NAME}}-${{ env.LATEST_TAG }}
 
   build-push-helm:
-    if: github.ref_name == 'main' || github.ref_name == 'dev'
+    if: (github.ref_name == 'main' || github.ref_name == 'dev') && contains(github.event.head_commit.message, 'openolat/')
     runs-on: ubuntu-latest
     steps:
       # 📦 Checkout Repository
