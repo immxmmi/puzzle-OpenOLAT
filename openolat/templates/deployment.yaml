@@ -17,13 +17,13 @@ spec:
       containers:
       - name: {{ .Release.Name }}
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
-#        resources:
-#          limits:
-#            memory: {{ .Values.resources.limits.memory }}
-#            cpu: {{ .Values.resources.limits.cpu }}
-#          requests:
-#            memory: {{ .Values.resources.requests.memory }}
-#            cpu: {{ .Values.resources.requests.cpu }}
+        resources:
+          limits:
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
+          requests:
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
         ports:
         - containerPort: 8080
         volumeMounts:
@@ -45,10 +45,10 @@ spec:
       - name: openolat-config
         configMap:
           name: {{ .Release.Name }}-openolat-config
-#      - name: openolat-userdata
-#        persistentVolumeClaim:
-#        {{- if .Values.config.userdataDirExistingVolumeClaimName }}
-#          claimName: {{ .Values.config.userdataDirExistingVolumeClaimName }}
-#        {{- else }}
-#          claimName: {{ .Release.Name }}-userdata-pvc
-#        {{- end }}
+      - name: openolat-userdata
+        persistentVolumeClaim:
+        {{- if .Values.config.userdataDirExistingVolumeClaimName }}
+          claimName: {{ .Values.config.userdataDirExistingVolumeClaimName }}
+        {{- else }}
+          claimName: {{ .Release.Name }}-userdata-pvc
+        {{- end }}
