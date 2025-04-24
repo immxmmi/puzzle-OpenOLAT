@@ -64,7 +64,7 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ env.BRANCH_NAME}}-${{ env.LATEST_TAG }}
 
   build-push-helm:
-    if: (github.ref_name == 'main' || github.ref_name == 'dev') # && contains(github.event.head_commit.message, 'openolat/')
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
     runs-on: ubuntu-latest
     steps:
       # 📦 Checkout Repository
