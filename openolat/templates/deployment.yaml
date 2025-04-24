@@ -54,7 +54,7 @@ spec:
           mountPath: /usr/local/tomcat/conf/Catalina/localhost/ROOT.xml
           subPath: ROOT.xml
         - name: openolat-config
-          mountPath: /usr/local/tomcat/lib/olat.local.properties.template
+          mountPath: /usr/local/tomcat/lib/olat.local.properties
           subPath: olat.properties
         - name: openolat-userdata
           mountPath: {{ .Values.config.userdataDir }}
