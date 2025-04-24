@@ -56,6 +56,11 @@ COPY ./config/lib/log4j2.xml lib/log4j2.xml
 
 # Create non-root user and set appropriate permissions for OpenOLAT runtime
 RUN useradd -m -s /bin/bash openolat
+
+# Set ownership of OpenOLAT directories to the non-root user
+RUN chown -R openolat:openolat /usr/local/tomcat \
+    && chmod -R 755 /usr/local/tomcat
+
 # Switch to non-root user for security
 USER openolat
 
