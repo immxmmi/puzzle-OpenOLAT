@@ -22,7 +22,7 @@ config:
     useOauth: false
     clientId: ""
     clientSecret: ""
-    endpoint: ""
+    oidc-ep: ""
     context: ""
     realm: ""
     attributenameUseridentifyer: ""

@@ -27,18 +27,18 @@ spec:
         - name: OAUTH_KEYCLOAK_CLIENT_ID
           valueFrom:
             secretKeyRef:
-              name: oauth-secret
-              key: client-id
+              name: oidc-client
+              key: clientId
         - name: OAUTH_KEYCLOAK_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
-              name: oauth-secret
-              key: client-secret
+              name: oidc-client
+              key: clientSecret
         - name: OAUTH_KEYCLOAK_ENDPOINT
           valueFrom:
             secretKeyRef:
-              name: oauth-secret
-              key: endpoint
+              name: oidc-client
+              key: oidc-ep
         {{- end }}
         resources:
           limits:
