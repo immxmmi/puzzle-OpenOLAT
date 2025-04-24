@@ -18,3 +18,6 @@ data:
     smtp.host={{ .Values.config.smtpHost }}
     tomcat.id={{ .Values.config.tomcatId }}
     userdata.dir={{ .Values.config.userdataDir }}
+    oauth.keycloak.context={{ .Values.config.oauth.context }}
+    oauth.keycloak.realm={{ .Values.config.oauth.realm }}
+    oauth.keycloak.attributename.useridentifyer={{ .Values.config.oauth.attributenameUseridentifyer }}

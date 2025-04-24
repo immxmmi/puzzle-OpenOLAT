@@ -23,6 +23,9 @@ config:
     clientId: ""
     clientSecret: ""
     endpoint: ""
+    context: ""
+    realm: ""
+    attributenameUseridentifyer: ""
 
 database:
   host: "openolat-postgresql.openolat.svc.cluster.local"
