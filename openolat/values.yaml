@@ -18,7 +18,11 @@ config:
   userdataDirExistingVolumeClaimName: ""
   # Only used if userdataDirExistingVolumeClaimName is not set
   userdataDirVolumeSize: "1Gi"
-
+  oauth:
+    useOauth: false
+    clientId: ""
+    clientSecret: ""
+    endpoint: ""
 
 database:
   host: "openolat-postgresql.openolat.svc.cluster.local"

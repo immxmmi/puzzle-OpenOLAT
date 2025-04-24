@@ -22,6 +22,24 @@ spec:
       containers:
       - name: {{ .Release.Name }}
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
+        {{- if .Values.config.oauth.useOauth }}
+        env:
+        - name: OAUTH_KEYCLOAK_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: oauth-secret
+              key: client-id
+        - name: OAUTH_KEYCLOAK_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth-secret
+              key: client-secret
+        - name: OAUTH_KEYCLOAK_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: oauth-secret
+              key: endpoint
+        {{- end }}
         resources:
           limits:
             memory: {{ .Values.resources.limits.memory }}
