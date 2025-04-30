@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-openolat-config
+  labels:
+    {{- include "openolat.labels" . | nindent 4 }}
+data:
+  olat.properties: |
+    db.source={{ .Values.database.source }}
+    db.jndi={{ .Values.database.jndi }}
+    db.vendor={{ .Values.database.vendor }}
+    installation.dir={{ .Values.config.installationDir }}
+    log.dir={{ .Values.config.logDir }}
+    server.contextpath={{ .Values.config.contextPath }}
+    server.domainname={{ .Values.config.domainName }}
+    server.port={{ .Values.config.port }}
+    server.port.ssl={{ .Values.config.sslPort }}
+    smtp.host={{ .Values.config.smtpHost }}
+    tomcat.id={{ .Values.config.tomcatId }}
+    userdata.dir={{ .Values.config.userdataDir }}
+    oauth.keycloak.context={{ .Values.config.oauth.context }}
+    oauth.keycloak.realm={{ .Values.config.oauth.realm }}
+    oauth.keycloak.attributename.useridentifyer={{ .Values.config.oauth.attributenameUseridentifyer }}
+    smtp.host={{ .Values.config.smtp.host }}
+    smtp.port={{ .Values.config.smtp.port }}
+    smtp.user={{ .Values.config.smtp.user }}
+    smtp.pwd={{ .Values.config.smtp.pwd }}
+    smtp.sslEnabled={{ .Values.config.smtp.sslEnabled }}
+    smtp.sslCheckCertificate={{ .Values.config.smtp.sslCheckCertificate }}
+    smtp.starttls={{ .Values.config.smtp.starttls }}
+    smtp.timeout={{ .Values.config.smtp.timeout }}
+    smtp.from={{ .Values.config.smtp.from }}
+    fromdomain={{ .Values.config.fromdomain }}
+    fromemail={{ .Values.config.fromemail }}
+    fromname={{ .Values.config.fromname }}
+    adminemail={{ .Values.config.adminemail }}
+    supportemail={{ .Values.config.supportemail }}
+    quotaemail={{ .Values.config.quotaemail }}
+    deleteuseremail={{ .Values.config.deleteuseremail }}
+    erroremail={{ .Values.config.erroremail }}
+    thumbnail.provider={{ .Values.config.thumbnailProvider }}
+    video.transcoding.taskset.cpuconfig={{ .Values.config.videoTranscodingTasksetCpuconfig }}
+    video.transcoding.resolutions={{ .Values.config.videoTranscodingResolutions }}
+    av.video.recording.enabled={{ .Values.config.av.videoRecordingEnabled }}
+    av.audio.recording.enabled={{ .Values.config.av.audioRecordingEnabled }}
+    av.local.transcoding.enabled={{ .Values.config.av.localTranscodingEnabled }}
+    av.local.audio.conversion.enabled={{ .Values.config.av.localAudioConversionEnabled }}
+    av.handbrakecli.path={{ .Values.config.av.handbrakecliPath }}
+    av.ffmpeg.path={{ .Values.config.av.ffmpegPath }}
+    gotenberg.url={{ .Values.config.gotenbergUrl }}

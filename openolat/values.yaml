@@ -18,6 +18,38 @@ config:
   userdataDirExistingVolumeClaimName: ""
   # Only used if userdataDirExistingVolumeClaimName is not set
   userdataDirVolumeSize: "1Gi"
+  # Mail config
+  smtp:
+    host: ""
+    port: 25
+    user: ""
+    pwd: ""
+    sslEnabled: false
+    sslCheckCertificate: false
+    starttls: false
+    timeout: 8000
+    from:
+  fromdomain: ""
+  fromemail: "no-reply@frentix.com"
+  fromname: "OpenOlat eLearning Server (${server.domainname})"
+  adminemail: "webmaster@frentix.com"
+  supportemail: "support@openolat.com"
+  quotaemail: "${supportemail}"
+  deleteuseremail: "${supportemail}"
+  erroremail: "support@openolat.com"
+  # Video config
+  thumbnailProvider: "magick"
+  videoTranscodingTasksetCpuconfig: "0,1"
+  videoTranscodingResolutions: "1080,720"
+  av:
+    videoRecordingEnabled: true
+    audioRecordingEnabled: true
+    localTranscodingEnabled: true
+    localAudioConversionEnabled: true
+    handbrakecliPath: ""
+    ffmpegPath: ""
+  gotenbergUrl:
+
   oauth:
     useOauth: false
     clientId: ""
